@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Primary SEO -->
+<title>WorldCupInMotion — FIFA World Cup 2026 Interactive Experience</title>
+<meta name="description" content="The most immersive FIFA World Cup 2026 experience on the web. Explore all 48 nations, live scores, group tables, player stats, and the interactive 3D globe across Canada, Mexico, and the United States.">
+<meta name="keywords" content="FIFA World Cup 2026, World Cup globe, WC2026 stats, football 2026, soccer live scores, World Cup teams">
+<meta name="author" content="WorldCupInMotion">
+<link rel="canonical" href="https://worldcupinmotion.com/">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://worldcupinmotion.com/">
+<meta property="og:title" content="WorldCupInMotion — FIFA World Cup 2026">
+<meta property="og:description" content="Cinematic, interactive World Cup 2026 experience. 48 nations, live scores, 3D globe, player stats, group tables and more.">
+<meta property="og:image" content="https://worldcupinmotion.com/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="WorldCupInMotion">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://worldcupinmotion.com/">
+<meta name="twitter:title" content="WorldCupInMotion — FIFA World Cup 2026">
+<meta name="twitter:description" content="Cinematic, interactive World Cup 2026 experience. 48 nations, live scores, 3D globe, player stats, group tables and more.">
+<meta name="twitter:image" content="https://worldcupinmotion.com/og-image.jpg">
+
+<!-- Favicon -->
+<link rel="icon" type="image/jpeg" href="assets/images/brand/jabulani.jpg?v=20260707">
+<link rel="shortcut icon" type="image/jpeg" href="assets/images/brand/jabulani.jpg?v=20260707">
+<link rel="apple-touch-icon" href="assets/images/brand/jabulani.jpg?v=20260707">
+<meta name="theme-color" content="#0a0a0a">
+
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "WorldCupInMotion",
+  "url": "https://worldcupinmotion.com/",
+  "description": "Interactive FIFA World Cup 2026 experience with live scores, 3D globe, player stats, and group tables.",
+  "about": {
+    "@type": "SportsEvent",
+    "name": "FIFA World Cup 2026",
+    "startDate": "2026-06-11",
+    "endDate": "2026-07-19",
+    "location": ["Canada", "Mexico", "United States"]
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+SC:wght@300;400;500&family=Barlow+Condensed:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css?v=20260717-secure-news">
+<script defer src="https://unpkg.com/globe.gl"></script>
+<script defer src="https://unpkg.com/topojson-client@3"></script>
+</head>
+<body class="light-cursor">
+
+<!-- Trophy: 3 layers (bokeh / shape / sharp texture) -->
+<img id="trophy-sharp" src="assets/images/brand/world-cup-trophy.webp" alt="">
+
+<!-- Trophy halo -->
+<div id="trophy-halo"></div>
+
+<!-- Animated glass reflections (moving light orbs) -->
+<div id="orb1"></div>
+<div id="orb2"></div>
+<div id="glass-sweep"></div>
+
+<!-- Apple liquid glass layer -->
+<div id="glass"></div>
+
+<div id="live-match-bar" class="is-hidden" aria-live="polite">
+  <div class="live-orbit">
+    <span class="live-dot" aria-hidden="true"></span>
+    <span class="live-state">Live</span>
+  </div>
+  <div class="live-mainline">
+    <span class="live-team home">Home</span>
+    <strong class="live-scoreline">0-0</strong>
+    <span class="live-team away">Away</span>
+  </div>
+  <div class="live-meta-row">
+    <strong class="live-match-title">Loading live match</strong>
+    <span class="live-stage">football-data.org</span>
+  </div>
+  <p class="live-scorers">Goal details loading</p>
+  <div class="live-next-row">
+    <span>Next</span>
+    <strong>Loading fixture</strong>
+  </div>
+</div>
+
+<!-- Globe (hidden, revealed on scroll) -->
+<div id="globe-wrap">
+  <div id="globe-ui">
+    <div id="globe-topbar">WORLD CUP IN MOTION</div>
+    <nav id="platform-nav" aria-label="WorldCupInMotion platform sections">
+      <button class="nav-pill" data-view="groups">Groups</button>
+      <button class="nav-pill" data-view="bracket">Bracket</button>
+      <button class="nav-pill" data-view="stadiums">Stadiums</button>
+      <button class="nav-pill" data-view="history">History</button>
+      <button class="nav-pill" data-view="predictions">News</button>
+    </nav>
+    <div id="globe-zoom" aria-label="Globe zoom controls">
+      <button class="zoom-btn" type="button" data-zoom="in" aria-label="Zoom in">+</button>
+      <button class="zoom-btn" type="button" data-zoom="out" aria-label="Zoom out">&minus;</button>
+    </div>
+    <div id="globe-stats">
+      <div class="globe-stat">
+        <span class="label">Tournament goals</span>
+        <span class="value" id="goal-count">0</span>
+      </div>
+      <div class="globe-stat">
+        <span class="label">Top scorer</span>
+        <span class="value" id="top-scorer">—</span>
+      </div>
+      <div class="globe-stat">
+        <span class="label">Tournament status</span>
+        <span class="value" id="tournament-days">Starts in 0d</span>
+      </div>
+      <div class="globe-stat ticker">
+        <div id="match-ticker"></div>
+      </div>
+    </div>
+  </div>
+  <div id="globe-hint">Tap a nation &middot; Drag to spin &middot; Scroll to explore</div>
+  <div id="globe-container"></div>
+  <div id="connection-layer" aria-hidden="true">
+    <span class="connection-line line-a"></span>
+    <span class="connection-line line-b"></span>
+    <span class="connection-line line-c"></span>
+  </div>
+  <aside id="nation-panel" aria-live="polite">
+    <button id="panel-close" type="button" aria-label="Close nation panel">&times;</button>
+    <div class="panel-kicker" id="panel-kicker">Select a nation</div>
+    <div class="panel-title-row">
+      <h2 id="panel-title">World Cup Command</h2>
+      <span id="panel-group">GLOBAL</span>
+    </div>
+    <p id="panel-summary">Spin the globe and choose a country to reveal the manager, star player, squad shape, fixtures, and World Cup story in one connected team dossier.</p>
+    <div class="panel-metrics">
+      <div><span id="metric-rank">--</span><small>Team data</small></div>
+      <div><span id="metric-form">--</span><small>Manager</small></div>
+      <div><span id="metric-odds">--</span><small>Top player</small></div>
+    </div>
+    <div class="panel-tabs" role="tablist" aria-label="Nation detail sections">
+      <button class="panel-tab active" data-panel="overview">Overview</button>
+      <button class="panel-tab" data-panel="squad">Squad</button>
+      <button class="panel-tab" data-panel="fixtures">Fixtures</button>
+      <button class="panel-tab" data-panel="story">Story</button>
+    </div>
+    <div id="panel-content"></div>
+  </aside>
+  <section id="platform-deck" aria-label="World Cup platform deck">
+    <article class="deck-card" data-card="countries">
+      <span>Countries</span>
+      <strong>National identities, key players, and tactical profiles.</strong>
+      <p>Designed for quick scanning without breaking the cinematic atmosphere.</p>
+    </article>
+    <article class="deck-card" data-card="fixtures">
+      <span>Fixtures</span>
+      <strong>Match paths become animated routes across the host map.</strong>
+      <p>The ticker and nation panel share one data model, ready for a live API feed.</p>
+    </article>
+    <article class="deck-card" data-card="stadiums">
+      <span>Stadiums</span>
+      <strong>Host venues surface as premium destination cards.</strong>
+      <p>Capacity, city, altitude, and atmosphere can attach to every fixture.</p>
+    </article>
+    <article class="deck-card" data-card="history">
+      <span>History</span>
+      <strong>Past records fold into the present tournament view.</strong>
+      <p>Titles, iconic runs, and edition timelines can be explored from each country.</p>
+    </article>
+    <article class="deck-card" data-card="predictions">
+      <span>News</span>
+      <strong>World Cup 2026 moments, records, and knockout headlines.</strong>
+      <p>Story cards open trusted live coverage without changing the globe experience.</p>
+    </article>
+  </section>
+  <section id="feature-hub" aria-label="World Cup feature hub">
+    <div class="hub-head">
+      <div>
+        <span id="hub-kicker">Platform layer</span>
+        <h2 id="hub-title">World Cup Command</h2>
+      </div>
+      <button id="hub-close" type="button" aria-label="Close feature panel">&times;</button>
+    </div>
+    <label id="global-search-wrap">
+      <span>Search</span>
+      <input id="global-search" type="search" autocomplete="off" placeholder="Teams, players, stadiums, countries">
+    </label>
+    <div id="feature-panel"></div>
+  </section>
+</div>
+
+<div id="cur-ring"></div>
+<div id="cur"></div>
+<div id="flash"></div>
+<div id="prog"></div>
+<div id="count">01 / 23</div>
+<button id="skip-btn" onclick="skip()">Skip →</button>
+
+<!-- Intro text stage -->
+<div id="stage">
+  <div id="yr">1930</div>
+  <div id="rule"></div>
+  <div id="country">Uruguay</div>
+</div>
+
+<!-- Reveal screen -->
+<div id="reveal">
+  <div id="rv-eyebrow">FIFA World Cup · Since 1930</div>
+  <div id="rv-title"></div>
+  <div id="rv-line"></div>
+  <div id="rv-sub">2026 · Canada · Mexico · United States</div>
+  <div id="scroll-hint">
+    <span>Scroll</span>
+    <div class="chev"></div>
+    <div class="chev"></div>
+    <div class="chev"></div>
+  </div>
+</div>
+
+<!-- Tournament statistics parallax scene -->
+<section id="stats-scene" aria-label="Tournament statistics">
+  <div id="stats-bg-grid"></div>
+  <div id="stats-copy">
+    <div class="panel-kicker">FIFA World Cup 2026</div>
+    <h2>Tournament Statistics</h2>
+    <p>Canada · Mexico · United States. The largest World Cup ever assembled.</p>
+  </div>
+  <div id="stats-rail">
+    <article class="stat-tile">
+      <span>Qualified Teams</span>
+      <strong>48</strong>
+      <p>The largest World Cup field ever, built for country-by-country live data.</p>
+    </article>
+    <article class="stat-tile">
+      <span>Total Matches</span>
+      <strong>104</strong>
+      <p>Group stage through final across North America.</p>
+    </article>
+    <article class="stat-tile">
+      <span>Host Cities</span>
+      <strong>16</strong>
+      <p>Venues across Canada, Mexico, and the United States.</p>
+    </article>
+    <article class="stat-tile">
+      <span>Host Nations</span>
+      <strong>3</strong>
+      <p>One tournament. Three football cultures. Billions watching.</p>
+    </article>
+  </div>
+
+  <!-- Player leaderboard -->
+  <div id="stats-leaderboard">
+    <div class="lb-head">
+      <h3>Player Stats</h3>
+      <div class="lb-tabs" role="tablist">
+        <button class="lb-tab active" data-lb="goals">Goals</button>
+        <button class="lb-tab" data-lb="assists">Assists</button>
+        <button class="lb-tab" data-lb="clean">Clean Sheets</button>
+        <button class="lb-tab" data-lb="saves">Saves</button>
+        <button class="lb-tab" data-lb="motm">MOTM</button>
+        <button class="lb-tab" data-lb="yellow">Yellow Cards</button>
+        <button class="lb-tab" data-lb="red">Red Cards</button>
+      </div>
+    </div>
+    <div class="lb-cols">
+      <span class="lb-col-player">Player</span>
+      <span class="lb-col-stat" id="lb-stat-label">Goals</span>
+    </div>
+    <p class="data-note">Checking football-data.org live feed...</p>
+
+    <!-- Goals -->
+    <div class="lb-rows" data-tab="goals">
+      <div class="lb-row">
+        <div class="lb-rank gold">1</div>
+        <div class="lb-avatar">LM</div>
+        <div class="lb-info">
+          <span class="lb-name">Lionel Messi</span>
+          <span class="lb-country"><span class="lb-flag">🇦🇷</span>Argentina</span>
+        </div>
+        <div class="lb-value">6</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank silver">2</div>
+        <div class="lb-avatar">EH</div>
+        <div class="lb-info">
+          <span class="lb-name">Erling Haaland</span>
+          <span class="lb-country"><span class="lb-flag">🇳🇴</span>Norway</span>
+        </div>
+        <div class="lb-value">4</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank silver">2</div>
+        <div class="lb-avatar">KM</div>
+        <div class="lb-info">
+          <span class="lb-name">Kylian Mbappé</span>
+          <span class="lb-country"><span class="lb-flag">🇫🇷</span>France</span>
+        </div>
+        <div class="lb-value">4</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank silver">2</div>
+        <div class="lb-avatar">OD</div>
+        <div class="lb-info">
+          <span class="lb-name">Ousmane Dembélé</span>
+          <span class="lb-country"><span class="lb-flag">🇫🇷</span>France</span>
+        </div>
+        <div class="lb-value">4</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank silver">2</div>
+        <div class="lb-avatar">VJ</div>
+        <div class="lb-info">
+          <span class="lb-name">Vinícius Júnior</span>
+          <span class="lb-country"><span class="lb-flag">🇧🇷</span>Brazil</span>
+        </div>
+        <div class="lb-value">4</div>
+      </div>
+    </div>
+
+    <!-- Assists -->
+    <div class="lb-rows" data-tab="assists" style="display:none">
+      <div class="lb-row">
+        <div class="lb-rank gold">1</div>
+        <div class="lb-avatar">TB</div>
+        <div class="lb-info">
+          <span class="lb-name">Toni Kroos</span>
+          <span class="lb-country"><span class="lb-flag">🇩🇪</span>Germany</span>
+        </div>
+        <div class="lb-value">5</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank silver">2</div>
+        <div class="lb-avatar">LM</div>
+        <div class="lb-info">
+          <span class="lb-name">Lionel Messi</span>
+          <span class="lb-country"><span class="lb-flag">🇦🇷</span>Argentina</span>
+        </div>
+        <div class="lb-value">4</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank bronze">3</div>
+        <div class="lb-avatar">KB</div>
+        <div class="lb-info">
+          <span class="lb-name">Kevin De Bruyne</span>
+          <span class="lb-country"><span class="lb-flag">🇧🇪</span>Belgium</span>
+        </div>
+        <div class="lb-value">3</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank bronze">3</div>
+        <div class="lb-avatar">LM</div>
+        <div class="lb-info">
+          <span class="lb-name">Lamine Yamal</span>
+          <span class="lb-country"><span class="lb-flag">🇪🇸</span>Spain</span>
+        </div>
+        <div class="lb-value">3</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank bronze">3</div>
+        <div class="lb-avatar">PN</div>
+        <div class="lb-info">
+          <span class="lb-name">Phil Foden</span>
+          <span class="lb-country"><span class="lb-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>England</span>
+        </div>
+        <div class="lb-value">3</div>
+      </div>
+    </div>
+
+    <!-- Clean Sheets -->
+    <div class="lb-rows" data-tab="clean" style="display:none">
+      <div class="lb-row">
+        <div class="lb-rank gold">1</div>
+        <div class="lb-avatar">EM</div>
+        <div class="lb-info">
+          <span class="lb-name">Emiliano Martinez</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ‡¦ðŸ‡·</span>Argentina</span>
+        </div>
+        <div class="lb-value">4</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank silver">2</div>
+        <div class="lb-avatar">MU</div>
+        <div class="lb-info">
+          <span class="lb-name">Manuel Neuer</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ‡©ðŸ‡ª</span>Germany</span>
+        </div>
+        <div class="lb-value">3</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank silver">2</div>
+        <div class="lb-avatar">AC</div>
+        <div class="lb-info">
+          <span class="lb-name">Alisson Becker</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ‡§ðŸ‡·</span>Brazil</span>
+        </div>
+        <div class="lb-value">3</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank bronze">4</div>
+        <div class="lb-avatar">MS</div>
+        <div class="lb-info">
+          <span class="lb-name">Mike Maignan</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ‡«ðŸ‡·</span>France</span>
+        </div>
+        <div class="lb-value">2</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank bronze">4</div>
+        <div class="lb-avatar">UP</div>
+        <div class="lb-info">
+          <span class="lb-name">Unai Simon</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ‡ªðŸ‡¸</span>Spain</span>
+        </div>
+        <div class="lb-value">2</div>
+      </div>
+    </div>
+
+    <!-- Saves -->
+    <div class="lb-rows" data-tab="saves" style="display:none">
+      <div class="lb-row">
+        <div class="lb-rank gold">1</div>
+        <div class="lb-avatar">ON</div>
+        <div class="lb-info">
+          <span class="lb-name">Andre Onana</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ‡¨ðŸ‡²</span>Cameroon</span>
+        </div>
+        <div class="lb-value">24</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank silver">2</div>
+        <div class="lb-avatar">EM</div>
+        <div class="lb-info">
+          <span class="lb-name">Emiliano Martinez</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ‡¦ðŸ‡·</span>Argentina</span>
+        </div>
+        <div class="lb-value">19</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank bronze">3</div>
+        <div class="lb-avatar">AS</div>
+        <div class="lb-info">
+          <span class="lb-name">Alisson Becker</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ‡§ðŸ‡·</span>Brazil</span>
+        </div>
+        <div class="lb-value">17</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank bronze">4</div>
+        <div class="lb-avatar">KO</div>
+        <div class="lb-info">
+          <span class="lb-name">Koen Casteels</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ‡§ðŸ‡ª</span>Belgium</span>
+        </div>
+        <div class="lb-value">15</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank bronze">5</div>
+        <div class="lb-avatar">ZS</div>
+        <div class="lb-info">
+          <span class="lb-name">Zack Steffen</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ‡ºðŸ‡¸</span>USA</span>
+        </div>
+        <div class="lb-value">14</div>
+      </div>
+    </div>
+
+    <!-- Man of the Match -->
+    <div class="lb-rows" data-tab="motm" style="display:none">
+      <div class="lb-row">
+        <div class="lb-rank gold">1</div>
+        <div class="lb-avatar">LM</div>
+        <div class="lb-info">
+          <span class="lb-name">Lionel Messi</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ‡¦ðŸ‡·</span>Argentina</span>
+        </div>
+        <div class="lb-value">4</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank silver">2</div>
+        <div class="lb-avatar">KM</div>
+        <div class="lb-info">
+          <span class="lb-name">Kylian Mbappe</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ‡«ðŸ‡·</span>France</span>
+        </div>
+        <div class="lb-value">3</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank bronze">3</div>
+        <div class="lb-avatar">VJ</div>
+        <div class="lb-info">
+          <span class="lb-name">Vinicius Junior</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ‡§ðŸ‡·</span>Brazil</span>
+        </div>
+        <div class="lb-value">2</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank bronze">3</div>
+        <div class="lb-avatar">JB</div>
+        <div class="lb-info">
+          <span class="lb-name">Jude Bellingham</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ´ó §ó ¢ó ¥ó ®ó §ó ¿</span>England</span>
+        </div>
+        <div class="lb-value">2</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank bronze">3</div>
+        <div class="lb-avatar">CP</div>
+        <div class="lb-info">
+          <span class="lb-name">Christian Pulisic</span>
+          <span class="lb-country"><span class="lb-flag">ðŸ‡ºðŸ‡¸</span>USA</span>
+        </div>
+        <div class="lb-value">2</div>
+      </div>
+    </div>
+
+    <!-- Yellow Cards -->
+    <div class="lb-rows" data-tab="yellow" style="display:none">
+      <div class="lb-row">
+        <div class="lb-rank gold">1</div>
+        <div class="lb-avatar">CE</div>
+        <div class="lb-info">
+          <span class="lb-name">Casemiro</span>
+          <span class="lb-country"><span class="lb-flag">🇧🇷</span>Brazil</span>
+        </div>
+        <div class="lb-value">3</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank gold">1</div>
+        <div class="lb-avatar">MG</div>
+        <div class="lb-info">
+          <span class="lb-name">Mario Gila</span>
+          <span class="lb-country"><span class="lb-flag">🇪🇸</span>Spain</span>
+        </div>
+        <div class="lb-value">3</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank silver">3</div>
+        <div class="lb-avatar">RG</div>
+        <div class="lb-info">
+          <span class="lb-name">Robert Gum</span>
+          <span class="lb-country"><span class="lb-flag">🇵🇱</span>Poland</span>
+        </div>
+        <div class="lb-value">2</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank silver">3</div>
+        <div class="lb-avatar">DL</div>
+        <div class="lb-info">
+          <span class="lb-name">Declan Rice</span>
+          <span class="lb-country"><span class="lb-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>England</span>
+        </div>
+        <div class="lb-value">2</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank silver">3</div>
+        <div class="lb-avatar">FA</div>
+        <div class="lb-info">
+          <span class="lb-name">Frenkie de Jong</span>
+          <span class="lb-country"><span class="lb-flag">🇳🇱</span>Netherlands</span>
+        </div>
+        <div class="lb-value">2</div>
+      </div>
+    </div>
+
+    <!-- Red Cards -->
+    <div class="lb-rows" data-tab="red" style="display:none">
+      <div class="lb-row">
+        <div class="lb-rank gold">1</div>
+        <div class="lb-avatar">AM</div>
+        <div class="lb-info">
+          <span class="lb-name">Achraf Hakimi</span>
+          <span class="lb-country"><span class="lb-flag">🇲🇦</span>Morocco</span>
+        </div>
+        <div class="lb-value">1</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank gold">1</div>
+        <div class="lb-avatar">RH</div>
+        <div class="lb-info">
+          <span class="lb-name">Robin Gosens</span>
+          <span class="lb-country"><span class="lb-flag">🇩🇪</span>Germany</span>
+        </div>
+        <div class="lb-value">1</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank gold">1</div>
+        <div class="lb-avatar">BF</div>
+        <div class="lb-info">
+          <span class="lb-name">Bruno Fernandes</span>
+          <span class="lb-country"><span class="lb-flag">🇵🇹</span>Portugal</span>
+        </div>
+        <div class="lb-value">1</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank gold">1</div>
+        <div class="lb-avatar">JC</div>
+        <div class="lb-info">
+          <span class="lb-name">John Brooks</span>
+          <span class="lb-country"><span class="lb-flag">🇺🇸</span>USA</span>
+        </div>
+        <div class="lb-value">1</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank gold">1</div>
+        <div class="lb-avatar">MC</div>
+        <div class="lb-info">
+          <span class="lb-name">Milan Škriniar</span>
+          <span class="lb-country"><span class="lb-flag">🇸🇰</span>Slovakia</span>
+        </div>
+        <div class="lb-value">1</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script defer src="js/app.js?v=20260717-secure-news"></script>
+
+</body>
+</html>
