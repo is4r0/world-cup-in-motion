@@ -117,5 +117,4 @@ We welcome contributions to enhance "World Cup in Motion"! If you have ideas for
 Made with ❤️ by [is4r0](https://github.com/is4r0)
 
 </div>
-```
 
