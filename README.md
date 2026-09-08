@@ -108,7 +108,7 @@ The application consumes data from a local API endpoint during development.
 
 ## 🤝 Contributing
 
-We welcome contributions to enhance "World Cup in Motion"! If you have ideas for new features, improvements, or bug fixes, please open an issue or submit a pull request.
+I welcome contributions to enhance "World Cup in Motion"! If you have ideas for new features, improvements, or bug fixes, please open an issue or submit a pull request.
 
 <div align="center">
 
