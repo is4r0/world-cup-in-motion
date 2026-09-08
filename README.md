@@ -14,6 +14,7 @@
 
 <img width="1895" height="868" alt="image" src="https://github.com/user-attachments/assets/3b3e381d-6cac-44b1-8a61-29c3c8374b0a" />
 
+---
 
 ## 🛠️ Tech Stack
 
