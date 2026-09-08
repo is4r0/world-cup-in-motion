@@ -82,40 +82,15 @@ world-cup-in-motion/
 ├── index.html            # Main entry point for the web application
 └── README.md             # This README file
 ```
-
-## 📚 API Reference
-
-The application consumes data from a local API endpoint during development.
-
-### Data Endpoint
--   **URL:** `/api/data`
--   **Method:** `GET`
--   **Description:** Retrieves all historical World Cup data in JSON format. This data is served directly from the `api/data.json` file.
--   **Example Response (Structure):**
-    ```json
-    // Example data structure from api/data.json (inferred)
-    [
-      {
-        "year": 1930,
-        "host_country": "Uruguay",
-        "winner": "Uruguay",
-        "runner_up": "Argentina",
-        "matches": [
-          // ... match details ...
-        ],
-        "teams": [
-          // ... team details ...
-        ]
-      },
-      // ... more World Cup editions ...
-    ]
-    ```
+---
 
 ## 🤝 Contributing
 
 I welcome contributions to enhance "World Cup in Motion"! If you have ideas for new features, improvements, or bug fixes, please open an issue or submit a pull request.
 
 <div align="center">
+
+---
 
 **⭐ Star this repo if you find it helpful or interesting!**
 
