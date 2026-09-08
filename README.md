@@ -6,6 +6,8 @@
 -   💡 **Contextual Tooltips:** Provides on-demand information for specific data points upon interaction.
 -   📱 **Responsive Design:** Ensures an optimal viewing experience across various devices and screen sizes.
 
+---
+
 ## 🖥️ Screenshots
 
 <img width="1897" height="865" alt="image" src="https://github.com/user-attachments/assets/b67fae1e-6f34-4580-89dd-5047b718e283" />
