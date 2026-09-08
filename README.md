@@ -53,18 +53,16 @@ To run the development server and access the local API, you need:
     git clone https://github.com/is4r0/world-cup-in-motion.git
     cd world-cup-in-motion
     ```
-
-2.  **No further dependency installation is required**
-    This project primarily uses vanilla JavaScript, HTML, and CSS, served by a simple Node.js development server that uses built-in modules.
-
-3.  **Start development server**
+2.  **Start development server**
     ```bash
     node dev-server.js
     ```
     This will start the server on `http://localhost:3000`.
 
-4.  **Open your browser**
+3.  **Open your browser**
     Visit `http://localhost:3000` to access the application.
+
+    ---
 
 ## 📁 Project Structure
 
