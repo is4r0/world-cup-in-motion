@@ -1,4 +1,4 @@
-## ✨ Features  
+## ✨ Features
 
 -   🌍 **Interactive Globe Visualization:** Dynamically displays World Cup data on a global map, likely showing host countries, team origins, or event progression.
 -   ⏳ **Dynamic Timeline Control:** Allows users to navigate through different World Cup editions, observing changes and trends over time.
